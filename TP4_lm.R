@@ -37,14 +37,7 @@ data.reg.test <- data.reg[-idx.train,]
 
 # - Selection du meilleur sous ensemble de prédicteurs
 
-# Premier choix de prédicteurs en fonction de la p-value
-lm.reg <- lm(y~., data = data.reg.train_val)
-lm.reg.pred <- summary(lm.reg)$coefficients[,4] < 0.001 # On ne prend que les prédicteurs les plus significatifs
-newdata.reg <- data.reg[lm.reg.pred] 
-newdata.reg$y <- data.reg$y
-
-# Second choix de prédicteurs avec la méthode de "best subset selection" et création des formules pour les tests de validation croisée
-lm.reg.fit <- regsubsets(y~., data=newdata.reg, method='exhaustive', nvmax=length(newdata.reg)-1)
+lm.reg.fit <- regsubsets(y~., data=data.reg, method='forward', nvmax=length(data.reg)-1)
 Formula <- make_formula(lm.reg.fit)
 
 # - Application d'une validation croisée sur chacun des bests subsets et détermination du nombre optimal de prédicteurs
@@ -61,17 +54,21 @@ for(i in (1:length(Formula))) {
   }
   CV[i] <- CV[i]/n
 }
-plot(CV, type="b") # 15 prédicteurs semblent être un bon compromis entre nombre de prédicteurs et performances
+par(mfrow = c(1, 2))
+plot(CV, type="b") # 50 prédicteurs semblent être un bon compromis entre nombre de prédicteurs et performances
 
 # Vérification du modèle sur les données de test
-#best_reg <- lm(Formula[which.min(CV)], data.reg.train_val)
-best_reg <- lm(Formula[15], data.reg.train_val) # Prédicteur lm
+best_reg <- lm(Formula[which.min(CV)], data.reg.train_val)
+#best_reg <- lm(Formula[50], data.reg.train_val) # Prédicteur lm
 best_pred <- predict(best_reg, newdata=data.reg.test)
 
-#plot(data.reg.test$y, best_pred)
-#abline(0,1)
+plot(data.reg.test$y, best_pred)
+abline(0,1)
+par(mfrow = c(1, 1))
 
 (err <- mean((data.reg.test$y - best_pred)^2))  # erreur quadratique moyenne
+
+
 
 # Nested cross validation ?
 
