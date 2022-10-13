@@ -2,11 +2,14 @@
 library('leaps')
 
 # 3 classes sur les données clas_data
+# Proportions des classes ?
 # 500 observations de 50 variables
 clas_data <- read.table('TPN1_a22_clas_app.txt')
 
 # 500 observations de 100 variables
 reg_data <- read.table('TPN1_a22_reg_app.txt')
+
+# Matrice de correlation ?
 
 # Partie 1 : Sélection des prédicteurs
 # exhaustive ?

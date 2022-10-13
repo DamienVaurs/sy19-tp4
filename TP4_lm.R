@@ -3,6 +3,15 @@ rm(list=ls())
 library('leaps')
 
 # Fonctions de service :
+make_one_formula <- function(names) {
+  # Création de la formule correspondante au modèle i
+  f <- "y ~"
+  for (name in names) {
+    f <- paste(f, "+", name)
+  }
+  return (f)
+}
+
 make_formula <- function(reg.fit) {
   
   Formula <- c()
@@ -12,11 +21,8 @@ make_formula <- function(reg.fit) {
     model <- model[2:length(model)] # On ne prend pas la colone (Intercept)
     model.names <- names(model)[model]
     
-    # Création de la formule correspondante au modèle i
-    f <- "y ~"
-    for (name in model.names[1:length(model.names)]) {
-      f <- paste(f, "+", name)
-    }
+    names <- model.names[1:length(model.names)]
+    f <- make_one_formula(names)
     
     # Ajout de la formule à la liste des formules
     Formula <- append(Formula, f)
@@ -25,9 +31,12 @@ make_formula <- function(reg.fit) {
   return (Formula)
 }
 
+
+
 # Partie 1 : Regression
 # 1) Modèle linéaire
 data.reg <- read.table("TPN1_a22_reg_app.txt")
+boxplot(data.reg[,-101])   # Vérifier s'il n'y a pas de valeurs abérentes
 
 # Séparation en un train set et un test set
 nrow <- nrow(data.reg)
@@ -42,7 +51,27 @@ data.reg.test <- data.reg[-idx.train,]
 lm.reg.fit <- regsubsets(y~., data=data.reg, method='forward', nvmax=length(data.reg)-1)
 Formula <- make_formula(lm.reg.fit)
 
+# BIC  -> On trouve un bon modèle avec peu de prédicteurs, mais ce n'est pas le meilleur modèle
+lm.reg.fit.summary <- summary(lm.reg.fit)
+bic <- lm.reg.fit.summary$outmat[which.min(lm.reg.fit.summary$bic), ]
+bic.predicteurs <- names(data.reg)[bic == "*"]
+plot(lm.reg.fit, scale="bic")  # 45 predicteurs
+f <- make_one_formula(bic.predicteurs)
+
+# Vérification du modèle sur les données de test
+best_reg <- lm(f, data.reg.train)
+best_pred <- predict(best_reg, newdata=data.reg.test)
+
+plot(data.reg.test$y, best_pred)
+abline(0,1)
+
+(err <- mean((data.reg.test$y - best_pred)^2))  # erreur quadratique moyenne
+cat("Meilleur modèle pour 'subset selection' avec ", which.min(lm.reg.fit.summary$bic), " prédicteur : ", f)
+cat("Erreur quadratique moyenne : ", err)
+
+
 # - Application d'une validation croisée sur chacun des bests subsets et détermination du nombre optimal de prédicteurs
+#  -> Bon modèle, mais varie beaucoup en fonction des données de train
 n <- nrow(data.reg.train)
 K <- 10
 folds <- sample(1:K, n, replace=TRUE)
@@ -73,7 +102,7 @@ cat("Meilleur modèle pour 'subset selection' avec ", which.min(CV), " prédicteur
 cat("Erreur quadratique moyenne : ", err)
 
 
-# Nested cross-validation
+# Nested cross-validation  -> Trouve un très bon modèle stable en fonction des données de train
 
 n1 <- nrow(data.reg)
 K1 <- 5
@@ -120,7 +149,7 @@ cat("Erreur quadratique moyenne : ", err)
 library(Matrix)
 library(glmnet)
 
-# Standardisation des prédicteur ?
+# Standardisation des prédicteur  -> Pas trop besoin car les variances des prédicteurs ne sont pas très différentes (cf boxplot)
 #xtrain.stand <- scale(data.reg.train)
 #xtest.stand <- scale(data.reg.test)
 #xtest <- data.matrix(xtest.stand[,1:ncol(xtest.stand)-1])
@@ -135,13 +164,14 @@ ytest <- data.reg.test$y
 
 cv.out <- cv.glmnet(xtrain, ytrain, alpha=0)
 plot(cv.out)
+cv.out$lambda.min
 
 fit <- glmnet(xtrain, ytrain, lambda=cv.out$lambda.min, alpha=0)
 ridge.pred <- predict(fit, s=cv.out$lambda.min, newx=xtest)
 (err <- mean((ytest - ridge.pred)^2))
 cat("Erreur quadratique moyenne pour ridge : ", err)
 
-# Lasso  (plus éfficace que ridge et rédiut la dimension)
+# Lasso  (plus efficace que ridge et réduit la dimension)
 
 cv.out <- cv.glmnet(xtrain, ytrain, alpha=1)
 plot(cv.out)
@@ -151,7 +181,7 @@ lasso.pred <- predict(fit.lasso, s=cv.out$lambda.min, newx=xtest)
 (err <- (mean((ytest - lasso.pred)^2)))
 cat("Erreur quadratique moyenne pour lasso : ", err)
 
-# - Feature extraction  (Pas très concluant)
+# - Feature extraction  -> (Pas très concluant)
 
 # PCA
 data.reg.feature <- scale(data.reg)  # Centrer et réduire les données
@@ -170,9 +200,12 @@ pcr.fit <- pcr(y ~ .,data=data.reg, scale=TRUE, validation="CV")
 sum <- summary(pcr.fit)
 validationplot(pcr.fit, val.type="MSEP", legendpos="topright")
 
+# GAM 
 
+#install.packages("splines")
+library(splines)
 
-
+fit1 <- lm(data.reg.train ~ ., data=data.reg.train)
 
 
 
