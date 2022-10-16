@@ -7,10 +7,12 @@ output:
     number_sections: true
 ---
 
-```{r}
+```{r, echo=FALSE, results='hide'}
 #source("TP4_lm.R", encoding="utf-8")
-source("TP4_TestsMéthodes.R", encoding="utf-8")
+#source("TP4_TestsMéthodes.R", encoding="utf-8")
 ```
+
+
 
 \section*{Introduction}
 
@@ -21,13 +23,38 @@ Dans le cadre de l'UV SY19, nous avons réalisé un projet consistant en la sél
 
 Avant toute chose, il nous faut séparer notre jeu de données en 2 groupes : un groupe d'entraînement et un groupe de test. Pour cela, on utilise la fonction sample en tant que masque sur notre ensemble de données. Ici, nous avont choisi un paramètre 4/5, donc 400 variables d'entraînement pour 100 variables de test. 
 
-  \subsection{Séparation en 2 groupes}
+  \subsection{Modèle avec méthode BIC}
+  
+  \subsection{Modèle linéaire avec cross-validation}
+  
+  La validation croisée permet de tester différents sous-ensembles de données comme modèles d'apprentissage et de test. Ici, on fait de coupes de 1/10e et on se rend compte que 50 prédicteurs semblent être un bon compromis pour notre modèle.
+  
+  ```{r}
+  #plot(CV, type="b")
+  ```
+  
+  \subsection{Modèle linéaire avec nested cross-validation}
+  
+  La méthode de nested CV permet d'utiliser non pas 2 mais 3 ensembles de données. On va avoir l'ensemble d'entraînement, l'ensemble de validation, qui va permettre de sélectionner le meiller modèle et enfin l'ensemble de test, pour connaître la qualité de notre modèle. Cet ensemble de test est donc indépendant du reste ce qui permet d'éviter des biais et des fuites de données. On observe qu'avec cette méthode, le nombre optimal de prédicteurs semble être 57.
+  
+  ```{r}
+  #plot(CV1, type="b")
+  ```
+  
+  \subsection{Modèle avec méthode ridge}
+  
+  \subsection{Modèle avec méthode lasso}
+  
+  \subsection{Comparaison des modèles}
+  
+  En comparant les différents modèles obtenus, on constate que celui qui admet l'erreur quadratique moyenne la plus faible est le modèle obtenu avec nested cross-validation.
+  
+  ```{r}
+  #test_methodes(data.reg.test)
+  ```
 
 \newpage
 \section{Classification}
 
-```{r}
-test_methodes(data.reg.test)
-```
 
 

@@ -1,13 +1,14 @@
 # Modèle linéaire
+encoding="utf-8"
 
-source("TP4_lm.R", encoding="utf-8")
+#source("TP4_lm.R", encoding="utf-8")
 
 test_methodes <- function(dataTest) {
   
   best_reg <- lm(f, data.reg.train)
   best_pred_1 <- predict(best_reg, newdata=data.reg.test)
   err <- mean((data.reg.test$y - best_pred_1)^2)
-  cat("La méthode BIC a une erreur quadratique moyenne de :", err, "\n")
+  cat("La méthode BIC donne un modèle avec une erreur quadratique moyenne de :", err, "\n")
   
   best_reg <- lm(Formula[which.min(CV)], data.reg.train)
   best_pred_2 <- predict(best_reg, newdata=data.reg.test)

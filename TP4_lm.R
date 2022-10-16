@@ -1,4 +1,5 @@
 # Projet 1
+encoding="utf-8"
 rm(list=ls())
 library('leaps')
 
