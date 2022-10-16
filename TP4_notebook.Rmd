@@ -25,6 +25,8 @@ Avant toute chose, il nous faut séparer notre jeu de données en 2 groupes : un
 
   \subsection{Modèle avec méthode BIC}
   
+  Avec la méthode BIC, on trouve un modèle plutôt cohérent avec peu de prédicteurs (seulement 45).
+  
   \subsection{Modèle linéaire avec cross-validation}
   
   La validation croisée permet de tester différents sous-ensembles de données comme modèles d'apprentissage et de test. Ici, on fait de coupes de 1/10e et on se rend compte que 50 prédicteurs semblent être un bon compromis pour notre modèle.

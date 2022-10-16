@@ -1,7 +1,7 @@
 # Modèle linéaire
 encoding="utf-8"
 
-#source("TP4_lm.R", encoding="utf-8")
+source("TP4_lm.R", encoding="utf-8")
 
 test_methodes <- function(dataTest) {
   
