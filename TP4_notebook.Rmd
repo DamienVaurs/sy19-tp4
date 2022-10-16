@@ -7,9 +7,9 @@ output:
     number_sections: true
 ---
 
-```{r, echo=FALSE, results='hide'}
+```{r, echo=FALSE, results='hide', fig.show='hide', warning=FALSE, message=FALSE}
 #source("TP4_lm.R", encoding="utf-8")
-#source("TP4_TestsMéthodes.R", encoding="utf-8")
+source("TP4_TestsMéthodes.R", encoding="utf-8")
 ```
 
 
@@ -32,7 +32,7 @@ Avant toute chose, il nous faut séparer notre jeu de données en 2 groupes : un
   La validation croisée permet de tester différents sous-ensembles de données comme modèles d'apprentissage et de test. Ici, on fait de coupes de 1/10e et on se rend compte que 50 prédicteurs semblent être un bon compromis pour notre modèle.
   
   ```{r}
-  #plot(CV, type="b")
+  plot(CV, type="b")
   ```
   
   \subsection{Modèle linéaire avec nested cross-validation}
@@ -40,7 +40,7 @@ Avant toute chose, il nous faut séparer notre jeu de données en 2 groupes : un
   La méthode de nested CV permet d'utiliser non pas 2 mais 3 ensembles de données. On va avoir l'ensemble d'entraînement, l'ensemble de validation, qui va permettre de sélectionner le meiller modèle et enfin l'ensemble de test, pour connaître la qualité de notre modèle. Cet ensemble de test est donc indépendant du reste ce qui permet d'éviter des biais et des fuites de données. On observe qu'avec cette méthode, le nombre optimal de prédicteurs semble être 57.
   
   ```{r}
-  #plot(CV1, type="b")
+  plot(CV1, type="b")
   ```
   
   \subsection{Modèle avec méthode ridge}
@@ -52,7 +52,7 @@ Avant toute chose, il nous faut séparer notre jeu de données en 2 groupes : un
   En comparant les différents modèles obtenus, on constate que celui qui admet l'erreur quadratique moyenne la plus faible est le modèle obtenu avec nested cross-validation.
   
   ```{r}
-  #test_methodes(data.reg.test)
+  test_methodes(data.reg.test)
   ```
 
 \newpage
