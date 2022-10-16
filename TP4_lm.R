@@ -4,7 +4,7 @@ library('leaps')
 
 # Fonctions de service :
 make_one_formula <- function(names) {
-  # Création de la formule correspondante au modèle i
+  # CrÃ©ation de la formule correspondante au modÃ¨le i
   f <- "y ~"
   for (name in names) {
     f <- paste(f, "+", name)
@@ -17,14 +17,14 @@ make_formula <- function(reg.fit) {
   Formula <- c()
   for (i in 2:length(summary(reg.fit)$which[1,])-1) {
     
-    model <- summary(reg.fit)$which[i,] # Masque du modèle i
+    model <- summary(reg.fit)$which[i,] # Masque du mod?le i
     model <- model[2:length(model)] # On ne prend pas la colone (Intercept)
     model.names <- names(model)[model]
     
     names <- model.names[1:length(model.names)]
     f <- make_one_formula(names)
     
-    # Ajout de la formule à la liste des formules
+    # Ajout de la formule ? la liste des formules
     Formula <- append(Formula, f)
   }
   
@@ -34,11 +34,11 @@ make_formula <- function(reg.fit) {
 
 
 # Partie 1 : Regression
-# 1) Modèle linéaire
+# 1) Mod?le lin?aire
 data.reg <- read.table("TPN1_a22_reg_app.txt")
-boxplot(data.reg[,-101])   # Vérifier s'il n'y a pas de valeurs abérentes
+boxplot(data.reg[,-101])   # V?rifier s'il n'y a pas de valeurs ab?rentes
 
-# Séparation en un train set et un test set
+# S?paration en un train set et un test set
 nrow <- nrow(data.reg)
 idx.train <- sample(nrow, floor(4/5*nrow))
 data.reg.train <- data.reg[idx.train,]
@@ -47,18 +47,18 @@ data.reg.test <- data.reg[-idx.train,]
 
 # - Subset selection
 
-# Selection du meilleur sous ensemble de prédicteurs 
+# Selection du meilleur sous ensemble de pr?dicteurs 
 lm.reg.fit <- regsubsets(y~., data=data.reg, method='forward', nvmax=length(data.reg)-1)
 Formula <- make_formula(lm.reg.fit)
 
-# BIC  -> On trouve un bon modèle avec peu de prédicteurs, mais ce n'est pas le meilleur modèle
+# BIC  -> On trouve un bon mod?le avec peu de pr?dicteurs, mais ce n'est pas le meilleur mod?le
 lm.reg.fit.summary <- summary(lm.reg.fit)
 bic <- lm.reg.fit.summary$outmat[which.min(lm.reg.fit.summary$bic), ]
 bic.predicteurs <- names(data.reg)[bic == "*"]
 plot(lm.reg.fit, scale="bic")  # 45 predicteurs
 f <- make_one_formula(bic.predicteurs)
 
-# Vérification du modèle sur les données de test
+# V?rification du mod?le sur les donn?es de test
 best_reg <- lm(f, data.reg.train)
 best_pred <- predict(best_reg, newdata=data.reg.test)
 
@@ -66,12 +66,12 @@ plot(data.reg.test$y, best_pred)
 abline(0,1)
 
 (err <- mean((data.reg.test$y - best_pred)^2))  # erreur quadratique moyenne
-cat("Meilleur modèle pour 'subset selection' avec ", which.min(lm.reg.fit.summary$bic), " prédicteur : ", f)
+cat("Meilleur mod?le pour 'subset selection' avec ", which.min(lm.reg.fit.summary$bic), " pr?dicteur : ", f)
 cat("Erreur quadratique moyenne : ", err)
 
 
-# - Application d'une validation croisée sur chacun des bests subsets et détermination du nombre optimal de prédicteurs
-#  -> Bon modèle, mais varie beaucoup en fonction des données de train
+# - Application d'une validation crois?e sur chacun des bests subsets et d?termination du nombre optimal de pr?dicteurs
+#  -> Bon mod?le, mais varie beaucoup en fonction des donn?es de train
 n <- nrow(data.reg.train)
 K <- 10
 folds <- sample(1:K, n, replace=TRUE)
@@ -86,11 +86,11 @@ for(i in (1:length(Formula))) {
   CV[i] <- CV[i]/n
 }
 par(mfrow = c(1, 2))
-plot(CV, type="b") # 50 prédicteurs semblent être un bon compromis entre nombre de prédicteurs et performances
+plot(CV, type="b") # 50 pr?dicteurs semblent ?tre un bon compromis entre nombre de pr?dicteurs et performances
 
-# Vérification du modèle sur les données de test
+# V?rification du mod?le sur les donn?es de test
 best_reg <- lm(Formula[which.min(CV)], data.reg.train)
-#best_reg <- lm(Formula[40], data.reg.train) # Prédicteur lm ?
+#best_reg <- lm(Formula[40], data.reg.train) # Pr?dicteur lm ?
 best_pred <- predict(best_reg, newdata=data.reg.test)
 
 plot(data.reg.test$y, best_pred)
@@ -98,11 +98,11 @@ abline(0,1)
 par(mfrow = c(1, 1))
 
 (err <- mean((data.reg.test$y - best_pred)^2))  # erreur quadratique moyenne
-cat("Meilleur modèle pour 'subset selection' avec ", which.min(CV), " prédicteur : ", Formula[which.min(CV)])
+cat("Meilleur mod?le pour 'subset selection' avec ", which.min(CV), " pr?dicteur : ", Formula[which.min(CV)])
 cat("Erreur quadratique moyenne : ", err)
 
 
-# Nested cross-validation  -> Trouve un très bon modèle stable en fonction des données de train
+# Nested cross-validation  -> Trouve un tr?s bon mod?le stable en fonction des donn?es de train
 
 n1 <- nrow(data.reg)
 K1 <- 5
@@ -127,11 +127,11 @@ for (k1 in (1:K1)){
 CV1 <- CV1/K1
 
 par(mfrow = c(1, 2))
-plot(CV1, type="b") # 57 prédicteurs semblent être un bon compromis entre nombre de prédicteurs et performances
+plot(CV1, type="b") # 57 pr?dicteurs semblent ?tre un bon compromis entre nombre de pr?dicteurs et performances
 which.min(CV1)
-# Vérification du modèle sur les données de test
+# V?rification du mod?le sur les donn?es de test
 best_reg <- lm(Formula[which.min(CV1)], data.reg.train)
-#best_reg <- lm(Formula[40], data.reg.train) # Prédicteur lm ?
+#best_reg <- lm(Formula[40], data.reg.train) # Pr?dicteur lm ?
 best_pred <- predict(best_reg, newdata=data.reg.test)
 
 plot(data.reg.test$y, best_pred)
@@ -139,7 +139,7 @@ abline(0,1)
 par(mfrow = c(1, 1))
 
 (err <- mean((data.reg.test$y - best_pred)^2))  # erreur quadratique moyenne
-cat("Meilleur modèle pour 'subset selection' avec ", which.min(CV1), " prédicteur : ", Formula[which.min(CV1)])
+cat("Meilleur mod?le pour 'subset selection' avec ", which.min(CV1), " pr?dicteur : ", Formula[which.min(CV1)])
 cat("Erreur quadratique moyenne : ", err)
 
 # - Regularization (Shrinkage)
@@ -149,7 +149,7 @@ cat("Erreur quadratique moyenne : ", err)
 library(Matrix)
 library(glmnet)
 
-# Standardisation des prédicteur  -> Pas trop besoin car les variances des prédicteurs ne sont pas très différentes (cf boxplot)
+# Standardisation des pr?dicteur  -> Pas trop besoin car les variances des pr?dicteurs ne sont pas tr?s diff?rentes (cf boxplot)
 #xtrain.stand <- scale(data.reg.train)
 #xtest.stand <- scale(data.reg.test)
 #xtest <- data.matrix(xtest.stand[,1:ncol(xtest.stand)-1])
@@ -171,7 +171,7 @@ ridge.pred <- predict(fit, s=cv.out$lambda.min, newx=xtest)
 (err <- mean((ytest - ridge.pred)^2))
 cat("Erreur quadratique moyenne pour ridge : ", err)
 
-# Lasso  (plus efficace que ridge et réduit la dimension)
+# Lasso  (plus efficace que ridge et r?duit la dimension)
 
 cv.out <- cv.glmnet(xtrain, ytrain, alpha=1)
 plot(cv.out)
@@ -181,10 +181,10 @@ lasso.pred <- predict(fit.lasso, s=cv.out$lambda.min, newx=xtest)
 (err <- (mean((ytest - lasso.pred)^2)))
 cat("Erreur quadratique moyenne pour lasso : ", err)
 
-# - Feature extraction  -> (Pas très concluant)
+# - Feature extraction  -> (Pas tr?s concluant)
 
 # PCA
-data.reg.feature <- scale(data.reg)  # Centrer et réduire les données
+data.reg.feature <- scale(data.reg)  # Centrer et r?duire les donn?es
 pca <- princomp(data.reg.feature)
 Z <- pca$scores
 head(pca)
@@ -192,7 +192,7 @@ lambda <- pca$sdev^2
 
 plot(cumsum(lambda)/sum(lambda), type="l", xlab="q", ylab="proportion of explained variance")
 
-# PCR  (MSE similaire à cross validation, mais avec tous les prédicteurs)
+# PCR  (MSE similaire ? cross validation, mais avec tous les pr?dicteurs)
 #install.packages("pls")
 library(pls)
 

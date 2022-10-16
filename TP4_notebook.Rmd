@@ -1,0 +1,37 @@
+---
+title: "Projet 1 SY19"
+output: 
+  pdf_document:
+    toc: true 
+    toc_depth: 2
+    number_sections: true
+---
+
+```{r}
+#source("TP4_lm.R", encoding="utf-8")
+source("TP4_TestsMéthodes.R", encoding="utf-8")
+```
+
+\section*{Introduction}
+
+Dans le cadre de l'UV SY19, nous avons réalisé un projet consistant en la sélection des modèles optimaux pour un problème de régression et un problème de classification. Ce rapport est constitué d'une première partie résumant nos différentes approches pour la régression, puis une deuxième partie concernant la classification.
+
+\newpage
+\section{Régression}
+
+Avant toute chose, il nous faut séparer notre jeu de données en 2 groupes : un groupe d'entraînement et un groupe de test. Pour cela, on utilise la fonction sample en tant que masque sur notre ensemble de données. Ici, nous avont choisi un paramètre 4/5, donc 400 variables d'entraînement pour 100 variables de test. 
+
+  \subsection{Séparation en 2 groupes}
+
+\newpage
+\section{Classification}
+
+```{r}
+test_methodes(data.reg.test)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
