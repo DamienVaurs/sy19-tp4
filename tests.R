@@ -2,7 +2,9 @@
 library(MASS) # lda
 library('leaps')
 
+# 1. Apprentissage des mod�les 
 
+# Regression
 make_one_formula <- function(names) {
   # Création de la formule correspondante au modèle i
   f <- "y ~"
@@ -43,16 +45,18 @@ bic.predicteurs <- bic.predicteurs[-length(bic.predicteurs)] # Attention ? enlev
 plot(lm.reg.fit, scale="bic")  # 46 predicteurs
 f <- make_one_formula(bic.predicteurs)  
 
-
-
 reg <- lm(f, data = X.reg)
 
+
+# Classification
 X.clas = read.table("TPN1_a22_clas_app.txt")
 clas <- lda(y ~ ., data = X.clas)
 
+
+
 # 2. Création des fonctions de prédiction
 
-prediction_cls <- function(test_set) {
+prediction_cls <- function(dataset) {
     # Ne pas oublier de charger **à l'intérieur de la fonction** les
     # bibliothèques utilisées.
     library(MASS)
@@ -62,10 +66,9 @@ prediction_cls <- function(test_set) {
     predict(clas, test_set)$class
 }
 
-prediction_reg <- function(test_set) {
-    predict(reg, test_set)
+prediction_reg <- function(dataset) {
+  predict(reg, newdata=dataset)
 }
-
 
 # 3. Sauvegarder sous forme de fichier .Rdata les fonctions
 # `prediction_cls` et `prediction_reg` sans changer leur nom et avec
